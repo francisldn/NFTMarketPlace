@@ -6,9 +6,10 @@ import {nftaddress, nftmarketaddress} from '../config.js'
 import NFT from '../artifacts/contracts/NFT.sol/NFT.json'
 import NFTMarket from '../artifacts/contracts/NFTMarket.sol/NFTMarket.json'
 
-export default function Home() {
+export default function MyNFT() {
   const [nft, setNFT]= useState([])
   const [loadingState, setLoadingState] = useState('not-loaded')
+  const [nftSold, setNFTSold] = useState([])
 
   useEffect(async () => {
     await loadNFTdata()
@@ -20,9 +21,10 @@ export default function Home() {
     const web3Modal = new Web3Modal()
     const connection = await web3Modal.connect();
     const provider = new ethers.providers.Web3Provider(connection)
-    const tokenContract = new ethers.Contract(nftaddress, NFT.abi, provider)
-    const marketContract = new ethers.Contract(nftmarketaddress, NFTMarket.abi, provider)
-    const data = await marketContract.fetchUnsoldNFT()
+    const signer = provider.getSigner()
+    const tokenContract = new ethers.Contract(nftaddress, NFT.abi, signer)
+    const marketContract = new ethers.Contract(nftmarketaddress, NFTMarket.abi, signer)
+    const data = await marketContract.fetchListedNFT()
 
     // get token data of listed tokens
     const items = await Promise.all(data.map(async i => {
@@ -39,7 +41,8 @@ export default function Home() {
           owner: i.owner,
           image: meta.data.image,
           name: meta.data.name,
-          description: meta.data.description
+          description: meta.data.description,
+          sold: i.sold
           }
           return item;
         } catch(err) {
@@ -47,34 +50,22 @@ export default function Home() {
           console.log('IPFS request failed', err)
         }
       }))
-    console.log(items)
+    
+    // filtered array of items that have been sold
+    const soldItems =  items.filter(i => i.sold)
+    setNFTSold(soldItems)
     setNFT(items)
     setLoadingState('loaded')
   }
   
-  //function for user to buy nft
-  async function buyNFT(nft) {
-    const web3Modal = new Web3Modal()
-    const connection = await web3Modal.connect()
-    const provider = new ethers.providers.Web3Provider(connection)
-    const signer = provider.getSigner()
-    const contract = new ethers.Contract(nftmarketaddress, NFTMarket.abi, signer)
-
-    const price = ethers.utils.parseUnits(nft.price.toString(), 'ether')
-    const transaction= await contract.createMarketSale(nftaddress, nft.tokenId, {
-      value: price
-    })
-    await transaction.wait()
-    loadNFTdata()
-  }
-
   if(loadingState === 'loaded' && !nft.length) {
     return (
-    <h1 className='px-20 py-7 text-4x1'>No NFTs in the Marketplace</h1>)
+    <h1 className='px-20 py-7 text-4x1'>No NFTs Purchased</h1>)
     }
 
   return (
     <div className='flex justify-center'>
+       <h1 style={{fontSize: '20px', color: 'purple'}}>Token Minted</h1>
        <div className='px-4' style={{maxWidth: '160px'}}></div>
        <div className= 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4'>
          {
@@ -91,10 +82,9 @@ export default function Home() {
               </div>
                 <div className='p-4 bg-black'>
                   <p className='text-3x-1 mb-4 font-bold text-white'>{nft.price} ETH</p>
-                  <button className='w-full bg-purple-500 text-white font-bold py-3 px-12 rounded' 
-                  onClick={() => buyNFT(nft)}>
-                    buy
-                  </button>
+              </div>
+              <div className='p-4 bg-black'>
+                  {nft.sold ? (<h3 className='text-3x-1 mb-4 font-bold text-white'>Sold</h3>) : ""}
               </div>
             </div>
            ))
