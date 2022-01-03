@@ -80,11 +80,11 @@ export default function MintItem() {
 
         //list the item for sale on the marketplace
         contract = new ethers.Contract(nftmarketaddress, NFTMarket.abi, signer);
-        let listingPrice = await contract.getListingPrice();
-        listingPrice = listingPrice.toString();
+        let listingFee = await contract.getListingFee();
+        listingFee = listingFee.toString();
 
         // list item
-        transaction = await contract.listMarketItem(nftaddress, tokenId, price, {value: listingPrice})
+        transaction = await contract.listMarketItem(nftaddress, tokenId, price, {value: listingFee})
         await transaction.wait()
         router.push('./')
     }

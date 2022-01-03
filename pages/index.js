@@ -7,13 +7,13 @@ import NFT from '../artifacts/contracts/NFT.sol/NFT.json'
 import NFTMarket from '../artifacts/contracts/NFTMarket.sol/NFTMarket.json'
 import {ErrorBoundary} from 'react-error-boundary';
 
-export default function Home() {
+export default function Home(props) {
   const [nft, setNFT]= useState([])
   const [loadingState, setLoadingState] = useState('not-loaded')
 
   useEffect(async () => {
-    await loadNFTdata()
-  }, [])
+    if(typeof props.user !== 'undefined') {await loadNFTdata()}
+  },[props])
 
   // function to display minted but unsold NFTs
   async function loadNFTdata() {
