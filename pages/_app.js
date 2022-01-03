@@ -1,9 +1,16 @@
 import '../styles/globals.css'
 import './app.css';
 import Link from 'next/link';
+import {ErrorBoundary} from 'react-error-boundary';
 
 function NFTMarketplace({Component, pageProps}) {
+  
+  const myErrorHandler = () => {
+    console.log("error")
+  }
+
   return (
+    <ErrorBoundary onError={myErrorHandler}>
     <div>
       <nav className='border-b p-6' style={{backgroundColor:'purple'}}>
         <p className='text-4x1 font-bold text-white'>NFT Marketplace</p>
@@ -32,6 +39,7 @@ function NFTMarketplace({Component, pageProps}) {
       </nav>
       <Component {...pageProps} />
     </div>
+    </ErrorBoundary>
   )
 }
 

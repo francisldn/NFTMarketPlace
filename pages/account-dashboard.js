@@ -21,6 +21,12 @@ export default function MyNFT() {
     const web3Modal = new Web3Modal()
     const connection = await web3Modal.connect();
     const provider = new ethers.providers.Web3Provider(connection)
+    // get Chain Id
+    const chainId = await provider.getNetwork().then(network => network.chainId);
+    if( chainId !== 4) {
+        window.alert("Please connect to the Rinkeby network");
+        return;
+    }
     const signer = provider.getSigner()
     const tokenContract = new ethers.Contract(nftaddress, NFT.abi, signer)
     const marketContract = new ethers.Contract(nftmarketaddress, NFTMarket.abi, signer)

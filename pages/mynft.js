@@ -5,7 +5,7 @@ import Web3Modal from 'web3modal'
 import {nftaddress, nftmarketaddress} from '../config.js'
 import NFT from '../artifacts/contracts/NFT.sol/NFT.json'
 import NFTMarket from '../artifacts/contracts/NFTMarket.sol/NFTMarket.json'
-import {useRouter} from 'next/router'
+
 
 export default function MyNFT() {
   const [nft, setNFT]= useState([])
@@ -21,6 +21,12 @@ export default function MyNFT() {
     const web3Modal = new Web3Modal()
     const connection = await web3Modal.connect();
     const provider = new ethers.providers.Web3Provider(connection)
+    // get Chain Id
+    const chainId = await provider.getNetwork().then(network => network.chainId);
+    if( chainId !== 4) {
+        window.alert("Please connect to the Rinkeby network");
+        return;
+    }
     const signer = provider.getSigner()
     const tokenContract = new ethers.Contract(nftaddress, NFT.abi, signer)
     const marketContract = new ethers.Contract(nftmarketaddress, NFTMarket.abi, signer)
@@ -44,10 +50,10 @@ export default function MyNFT() {
           description: meta.data.description
           }
           return item;
-        } catch(err) {
+      } catch(err) {
           item = ''
           console.log('IPFS request failed', err)
-        }
+      }
       }))
     console.log(items)
     setNFT(items)

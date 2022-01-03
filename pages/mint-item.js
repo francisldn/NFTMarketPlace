@@ -1,10 +1,11 @@
 import {ethers} from 'ethers';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {create as ipfsHttpClient} from 'ipfs-http-client'
 import Web3Modal from 'web3modal'
 import {nftaddress, nftmarketaddress} from '../config.js'
 import NFT from '../artifacts/contracts/NFT.sol/NFT.json'
 import NFTMarket from '../artifacts/contracts/NFTMarket.sol/NFTMarket.json'
+// useRouter to push to another webpage
 import {useRouter} from 'next/router'
 
 // get this from infura IPFS site
@@ -19,11 +20,13 @@ export default function MintItem() {
     async function onChange(e) {
         const file= e.target.files[0]
         try {
+        // upload metadata to infura-ipfs
         const added = await client.add(
             file, {
                 progress: (prog) => console.log(`received: ${prog}`)
             }
         )
+        // get metadata file path
         const url = `https://ipfs.infura.io/ipfs/${added.path}`
         setFileUrl(url)
         } catch (err) {
@@ -35,18 +38,19 @@ export default function MintItem() {
     async function createMarket() {
         const {name, description, price} = formInput
         if(!name || !description || !price || !fileUrl) return
-
+        
         const data = JSON.stringify({
             name, description, image: fileUrl
         })
         
         try {
+            // upload metadata to infura-ipfs
             const added = await client.add(data)
             const url = `https://ipfs.infura.io/ipfs/${added.path}`
             createSale(url)
-            } catch (err) {
+        } catch (err) {
                 console.log('Error uploading file', err)
-            }
+        }
     }
 
     //create the item through the form, mint token and list it on the marketplace
@@ -54,18 +58,24 @@ export default function MintItem() {
         const web3Modal = new Web3Modal()
         const connection = await web3Modal.connect();
         const provider = new ethers.providers.Web3Provider(connection)
+        // get Chain Id
+        const chainId = await provider.getNetwork().then(network => network.chainId);
+        if( chainId !== 4) {
+            window.alert("Please connect to the Rinkeby network");
+            return;
+        }
         const signer = provider.getSigner()
         
+        // create a contract instance and call methods
         let contract = new ethers.Contract(nftaddress, NFT.abi, signer)
         // call mintToken function
         let transaction = await contract.mintToken(url)
         // resolves to transactionReceipt
         let tx = await transaction.wait()
         console.log(tx)
-        let event = tx.events[0]
-        //get tokenId
-        let tokenId= event.args[2]
-        tokenId = tokenId.toNumber()
+        // based on transactionReceipt, extract tokenId
+        let tokenId = tx.events[0].args[2].toNumber()
+        console.log(tokenId)
         const price = ethers.utils.parseUnits(formInput.price, 'ether')
 
         //list the item for sale on the marketplace

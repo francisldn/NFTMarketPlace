@@ -13,8 +13,8 @@ describe("NFTMarket", function () {
     await nft.deployed()
     const nftContractAddress = nft.address
 
-    let listingPrice= await market.getListingPrice()
-    listingPrice = listingPrice.toString()
+    let listingFee= await market.getListingFee()
+    listingFee = listingFee.toString()
 
     const auctionPrice = ethers.utils.parseUnits('100', 'ether')
 
@@ -23,8 +23,8 @@ describe("NFTMarket", function () {
     await nft.mintToken('https-t2')
 
     // list newly minted NFTs 
-    await market.listMarketItem(nftContractAddress,1, auctionPrice, {value: listingPrice});
-    await market.listMarketItem(nftContractAddress, 2, auctionPrice, {value: listingPrice});
+    await market.listMarketItem(nftContractAddress,1, auctionPrice, {value: listingFee});
+    await market.listMarketItem(nftContractAddress, 2, auctionPrice, {value: listingFee});
 
     // get an array of addresses for testing
     const [_, buyerAddress] = await ethers.getSigners();
