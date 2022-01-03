@@ -6,15 +6,16 @@ import {nftaddress, nftmarketaddress} from '../config.js'
 import NFT from '../artifacts/contracts/NFT.sol/NFT.json'
 import NFTMarket from '../artifacts/contracts/NFTMarket.sol/NFTMarket.json'
 
-export default function MyNFT(user) {
+export default function MyNFT(props) {
   const [nft, setNFT]= useState([])
   const [loadingState, setLoadingState] = useState('not-loaded')
-  const [nftSold, setNFTSold] = useState([])
+  const [nftSold, setNFTSold] = useState([]);
 
   useEffect(async () => {
     if(typeof props.user !== 'undefined') {await loadNFTdata()}
   }, [props])
 
+  
   // function to display minted but unsold NFTs
   async function loadNFTdata() {
     // to load provider, tokenContract, marketContract, data for marketItems
@@ -23,9 +24,10 @@ export default function MyNFT(user) {
     const provider = new ethers.providers.Web3Provider(connection)
     // get Chain Id
     const chainId = await provider.getNetwork().then(network => network.chainId);
+    
     if( chainId !== 4) {
-        window.alert("Please connect to the Rinkeby network");
-        return;
+      window.alert("Please connect to the Rinkeby network");
+      return;
     }
     const signer = provider.getSigner()
     const tokenContract = new ethers.Contract(nftaddress, NFT.abi, signer)

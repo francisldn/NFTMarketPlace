@@ -13,6 +13,7 @@ export default function Home(props) {
 
   useEffect(async () => {
     if(typeof props.user !== 'undefined') {await loadNFTdata()}
+    console.log(props.user)
   },[props])
 
   // function to display minted but unsold NFTs
