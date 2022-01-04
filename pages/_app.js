@@ -41,7 +41,7 @@ function NFTMarketplace({Component, pageProps}) {
           </Link>
           <Link href='/mynft'>
             <a className='mr-6'>
-              My NFts
+              My NFTs
             </a>
           </Link>
           <Link href='/account-dashboard'>

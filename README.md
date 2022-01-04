@@ -1,15 +1,30 @@
-# Basic Sample Hardhat Project
+# NFT Marketplace
+## About
+This DApp is an NFT marketplace which allows users to mint, list, buy and sell NFTs. Users can fill in a simple form containing the metadata of the NFT such as name, description, price and uploading the image file. 
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+There are 2 contracts: 
+* NFT - allows user to mint his/her own token
+* NFTMarketplace - allows user to list, buy and sell tokens
 
-Try running some of the following tasks:
+## Dependencies
+To run the DApp in a local environment, the following dependencies are required:
+* Node v14.15.0
+  * download Node: https://nodejs.org/en/download/
+* Hardhat
+  * ``npx hardhat``
+  * ``npm install --save-dev @nomiclabs/hardhat-waffle ethereum-waffle chai @nomiclabs/hardhat-ethers ethers``
+* Openzeppelin contracts and libraries: ``npm i @openzeppelin/contracts``
+* Front end 
+  * React - NextJS: ``npx create-next-app YOUR_APP``
+* Web3modal/Ethers
+  * Ethers: ``npm i --save ethers``
+  * Web3modal: ``npm i --save web3modal`` 
+* Utils
+  * .env file: ``npm i dotenv``
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
-```
+## Frontend
+#### Web interface
+* Go to: https://nft-marketplace-lac.vercel.app/
+#### Localhost
+* Run ``npm run dev`` and the app will run on ``http://localhost:3000``
+
